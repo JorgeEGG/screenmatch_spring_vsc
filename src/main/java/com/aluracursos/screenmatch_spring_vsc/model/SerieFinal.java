@@ -150,9 +150,4 @@ public class SerieFinal {
     public void setSinopsis(String sinopsis) {
         this.sinopsis = sinopsis;
     }
-
-    
-
-    
-    
 }

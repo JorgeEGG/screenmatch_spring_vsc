@@ -89,7 +89,7 @@ public class EpisodioFinal {
     public String toString() {
         return "temporada " + temporada +
                " Episodio " + numeroEpisodio + 
-               ": " + titulo + 
+               " Título: " + titulo + 
                " (Evaluación: " + evaluacion + 
                " - Fecha de Lanzamiento: " + fechaDeLanzamiento + ")";
     }   

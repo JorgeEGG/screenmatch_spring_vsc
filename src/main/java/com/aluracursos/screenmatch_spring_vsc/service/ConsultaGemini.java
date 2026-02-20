@@ -8,7 +8,7 @@ public class ConsultaGemini {
     //     String modelo = "gemini-3.0-pro"; // O el modelo que prefieras
     //     String prompt = "Traduce el siguiente texto al español: " + texto;
 
-    //     // Client cliente = new Client.Builder().apiKey("AIzaSyBj0V0jSDIvTPF2VIGhgQ7_2ptj4bDZfmg").build();
+    //     Client cliente = new Client.Builder().apiKey(System.getenv("GEMINI_APIKEY")).build();
 
     //     try {
     //         GenerateContentResponse respuesta = cliente.models.generateContent(

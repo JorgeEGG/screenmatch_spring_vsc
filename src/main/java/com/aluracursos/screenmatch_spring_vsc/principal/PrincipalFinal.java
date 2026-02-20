@@ -28,6 +28,9 @@ public class PrincipalFinal {
     private List<SerieFinal> seriesFinal; // Se mantiene esta lista para almacenar las series obtenidas de la base de
                                           // datos, aunque también se podría obtener directamente del repositorio cada
                                           // vez que se necesite. Ver método mostrarSeriesBuscadas() para más detalles.
+    private Optional<SerieFinal> serieBuscada; // Se mantiene esta variable para almacenar la serie buscada por título,
+                                               // aunque también se podría obtener directamente del repositorio cada vez
+                                               // que se necesite. Ver método buscarSeriesPorTitulo() para más detalles.
 
     public PrincipalFinal(SerieFinalRepository repository) {
         this.repositorio = repository;
@@ -54,9 +57,12 @@ public class PrincipalFinal {
                     1. Buscar Series en la web
                     2. Buscar Episodios
                     3. Mostrar Series buscadas
-                    4. Buscar series en la DB por título
-                    5. Top 5 mejores series
-                    6. Buscar series por categoría
+                    4. Buscar Series en la DB por Título
+                    5. Top 5 mejores Series
+                    6. Buscar Series por Categoría
+                    7. Filtrar Series por Temporada y Evaluación
+                    8. Buscar Episodios por Título
+                    9. Top 5 de Episodios por Serie
 
                     0. Salir
                     """;
@@ -77,27 +83,54 @@ public class PrincipalFinal {
                     mostrarSeriesBuscadas();
                     break;
                 case 4:
-                    // El código comentado en seguida se puede descomentar para implementarlo, comentando el método buscarSeriesPorTitulo. También se puede implementar esta funcionalidad directamente en el case 4 del switch..
-                    // System.out.print("Por favor, escribe el título de la serie que deseas buscar: ");
+                    // El código comentado en seguida se puede descomentar para implementarlo,
+                    // comentando el método buscarSeriesPorTitulo. También se puede implementar esta
+                    // funcionalidad directamente en el case 4 del switch..
+                    // System.out.print("Por favor, escribe el título de la serie que deseas buscar:
+                    // ");
                     // var tituloSerie = teclado.nextLine();
                     // buscarSeriesPorTitulo(tituloSerie);
                     buscarSeriesPorTitulo();
-                     break;
+                    break;
                 case 5:
-                    // El código comentado en seguida se puede descomentar para implementarlo, comentando el método buscarTop5Series. También se puede implementar esta funcionalidad directamente en el case 5 del switch..
+                    // El código comentado en seguida se puede descomentar para implementarlo,
+                    // comentando el método buscarTop5Series. También se puede implementar esta
+                    // funcionalidad directamente en el case 5 del switch..
                     // List<SerieFinal> top5Series = repositorio.findTop5ByOrderByEvaluacionDesc();
                     // System.out.println("\nLas 5 mejores series según su evaluación son:\n");
                     // top5Series.forEach(s -> {
-                    //     System.out.println(s);
-                    //     System.out.println();
+                    // System.out.println(s);
+                    // System.out.println();
                     // });
                     buscarTop5Series();
                     break;
-                    case 6:
-                    // System.out.print("Por favor, escribe el género de las series que deseas buscar: ");
+                case 6:
+                    // System.out.print("Por favor, escribe el género de las series que deseas
+                    // buscar: ");
                     // var genero = teclado.nextLine();
                     // buscarSeriesPorGenero(genero);
                     buscarSeriesPorCategoria();
+                    break;
+                case 7:
+                    // System.out.print("Por favor, escribe el número de temporada para filtrar las
+                    // series: ");
+                    // var numeroTemporada = teclado.nextInt();
+                    // teclado.nextLine(); // Consumir el salto de línea después de leer el número
+                    // System.out.print("Por favor, escribe la evaluación mínima para filtrar las
+                    // series: ");
+                    // var evaluacionMinima = teclado.nextDouble();
+                    // teclado.nextLine(); // Consumir el salto de línea después de leer el número
+                    filtrarSeriesPorTemporadaYEvaluacion();
+                    break;
+                case 8:
+                    // System.out.print("Por favor, escribe el título del episodio que deseas
+                    // buscar: ");
+                    // var tituloEpisodio = teclado.nextLine();
+                    // buscarEpisodiosPorTitulo(tituloEpisodio);
+                    buscarEpisodiosPorTitulo();
+                    break;
+                case 9:
+                    buscarTop5Episodios();
                     break;
                 case 0:
                     System.out.println(
@@ -112,7 +145,6 @@ public class PrincipalFinal {
 
         }
     }
-
 
     private DatosSerieFinal getDatosSerieFinal() {
         System.out.print(
@@ -129,11 +161,12 @@ public class PrincipalFinal {
     private void buscarSerieWeb() {
         DatosSerieFinal datos = getDatosSerieFinal();
         if (datos == null || esResultadoInvalido(datos)) {
-            System.out.println("\nNo se encontró la serie en OMDb o la respuesta fue incompleta. Verifica el nombre e intenta nuevamente.\n");
+            System.out.println(
+                    "\nNo se encontró la serie en OMDb o la respuesta fue incompleta. Verifica el nombre e intenta nuevamente.\n");
             return;
         }
 
-        Optional<SerieFinal> serieExistente = repositorio.findByTituloIgnoreCase(datos.titulo().trim());
+        Optional<SerieFinal> serieExistente = repositorio.findByTituloContainsIgnoreCase(datos.titulo().trim());
 
         if (serieExistente.isPresent()) {
             System.out.println("\nLa serie ya está cargada en la base de datos:\n");
@@ -161,7 +194,10 @@ public class PrincipalFinal {
     private void buscarEpisodioPorSerie() {
         // DatosSerieFinal datosSerie = getDatosSerieFinal(); // Este método ya no se
         // utilizará porque los episodios se obtendrán directamente de la base de datos
-        mostrarSeriesBuscadas(); // Este método se mantiene para mostrar las series que se han buscado hasta ahora, pero ya no se utilizará para obtener los datos de la serie de la que se quieren buscar los episodios, sino que se obtendrán directamente de la base de datos. Por lo tanto, esta línea de código ya no es necesaria.
+        mostrarSeriesBuscadas(); // Este método se mantiene para mostrar las series que se han buscado hasta
+                                 // ahora, pero ya no se utilizará para obtener los datos de la serie de la que
+                                 // se quieren buscar los episodios, sino que se obtendrán directamente de la
+                                 // base de datos. Por lo tanto, esta línea de código ya no es necesaria.
         System.out.print("Por favor, escribe el nombre de la serie de la que deseas buscar los episodios: ");
         var nombreSerie = teclado.nextLine();
         Optional<SerieFinal> serieFinal = seriesFinal.stream()
@@ -182,7 +218,8 @@ public class PrincipalFinal {
             List<DatosTemporadasFinal> temporadas = new ArrayList<>();
 
             for (int i = 1; i <= serieEncontrada.getTotalDeTemporadas(); i++) {
-                var json = consumoAPI.obtenerDatos(URL_BASE + serieEncontrada.getTitulo().replace(" ", "+") + "&Season=" + i + API_KEY);
+                var json = consumoAPI.obtenerDatos(
+                        URL_BASE + serieEncontrada.getTitulo().replace(" ", "+") + "&Season=" + i + API_KEY);
                 DatosTemporadasFinal datosTemporadasFinal = conversor.obtenerDatos(json, DatosTemporadasFinal.class);
                 if (datosTemporadasFinal == null || esTemporadaInvalida(datosTemporadasFinal)) {
                     System.out.println("No se encontraron episodios válidos para la temporada " + i + ".");
@@ -192,26 +229,28 @@ public class PrincipalFinal {
             }
 
             if (temporadas.isEmpty()) {
-                System.out.println("\nNo fue posible obtener episodios válidos desde OMDb para la serie '" + serieEncontrada.getTitulo() + "'.\n");
+                System.out.println("\nNo fue posible obtener episodios válidos desde OMDb para la serie '"
+                        + serieEncontrada.getTitulo() + "'.\n");
                 return;
             }
-            
+
             System.out.println();
             // temporadas.forEach(System.out::println);
             // El siguie
             temporadas.forEach(t -> {
-            System.out.println(t);
-            System.out.println();
+                System.out.println(t);
+                System.out.println();
             });
             List<EpisodioFinal> episodios = temporadas.stream()
                     .flatMap(t -> t.episodios().stream()
                             .map(e -> new EpisodioFinal(t.numero(), e)))
                     .collect(Collectors.toList());
 
-                if (episodios.isEmpty()) {
-                System.out.println("\nNo se obtuvieron episodios para guardar de la serie '" + serieEncontrada.getTitulo() + "'.\n");
+            if (episodios.isEmpty()) {
+                System.out.println("\nNo se obtuvieron episodios para guardar de la serie '"
+                        + serieEncontrada.getTitulo() + "'.\n");
                 return;
-                }
+            }
 
             serieEncontrada.setEpisodios(episodios);
             repositorio.save(serieEncontrada); // Se actualiza la serie en la base de datos con los episodios obtenidos
@@ -244,11 +283,12 @@ public class PrincipalFinal {
         System.out.print("Por favor, escribe el nombre de la serie que deseas buscar: ");
         var nombreSerie = teclado.nextLine();
         Optional<SerieFinal> serieBuscada = repositorio.findByTituloContainsIgnoreCase(nombreSerie);
-        
+
         if (serieBuscada.isPresent()) {
             System.out.println("\nLa serie que has buscado es: \n\n" + serieBuscada.get());
         } else {
-            System.out.println("\nNo se ha encontrado ninguna serie con el título '" + nombreSerie + "'. Por favor, intenta de nuevo con otro título.");
+            System.out.println("\nNo se ha encontrado ninguna serie con el título '" + nombreSerie
+                    + "'. Por favor, intenta de nuevo con otro título.");
         }
     }
 
@@ -256,32 +296,113 @@ public class PrincipalFinal {
         List<SerieFinal> top5Series = repositorio.findTop5ByOrderByEvaluacionDesc();
         System.out.println("\nLas 5 mejores series en la base de datos, según su evaluación son:\n");
         // top5Series.forEach(s -> {
-        //     System.out.println(s);
-        //     System.out.println();
+        // System.out.println(s);
+        // System.out.println();
         // });
         top5Series.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ", Evaluación: " + s.getEvaluacion()));
     }
 
     private void buscarSeriesPorCategoria() {
-        System.out.print("\nPor favor, escribe el género de las series que deseas buscar. Las categorías disponibles son " + Arrays.toString(Categoria.values()) + ": ");
+        System.out
+                .print("\nPor favor, escribe el género de las series que deseas buscar. Las categorías disponibles son "
+                        + Arrays.toString(Categoria.values()) + ": ");
         var genero = teclado.nextLine();
-         // El siguiente código comentado reemplaza las dos líneas de código que se encuentran debajo. También se puede implementar esta funcionalidad directamente en el método buscarSeriesPorCategoria(), sin necesidad de crear un método aparte para buscar las series por categoría.
-        // List<serieFinal> seriesPorCategoria = repositorio.findByGenero(Categoria.fromEspanol(genero)); // También se puede implementar esta funcionalidad directamente en el método buscarSeriesPorCategoria(), sin necesidad de crear un método aparte para buscar las series por categoría.
+        // El siguiente código comentado reemplaza las dos líneas de código que se
+        // encuentran debajo. También se puede implementar esta funcionalidad
+        // directamente en el método buscarSeriesPorCategoria(), sin necesidad de crear
+        // un método aparte para buscar las series por categoría.
+        // List<serieFinal> seriesPorCategoria =
+        // repositorio.findByGenero(Categoria.fromEspanol(genero)); // También se puede
+        // implementar esta funcionalidad directamente en el método
+        // buscarSeriesPorCategoria(), sin necesidad de crear un método aparte para
+        // buscar las series por categoría.
         try {
             var categoria = Categoria.fromEspanol(genero);
             List<SerieFinal> seriesPorCategoria = repositorio.findByGenero(categoria);
             if (seriesPorCategoria.isEmpty()) {
-                System.out.println("\nNo se han encontrado series para la categoría '" + categoria + "'. Intenta nuevamente con otra categoría.");
+                System.out.println("\nNo se han encontrado series para la categoría '" + categoria
+                        + "'. Intenta nuevamente con otra categoría.");
                 return;
-                
+
             }
             System.out.println("\nLas series que pertenecen al género '" + categoria + "' son:\n");
-            seriesPorCategoria.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ", Género: " + s.getGenero()));
+            seriesPorCategoria
+                    .forEach(s -> System.out.println("Serie: " + s.getTitulo() + ", Género: " + s.getGenero()));
         } catch (IllegalArgumentException e) {
             System.out.println("\nNo se encontró la categoría '" + genero + "'. Intenta nuevamente.");
         }
-        // seriesPorCategoria.forEach(System.out::println); 
+        // seriesPorCategoria.forEach(System.out::println);
     }
 
+    public void filtrarSeriesPorTemporadaYEvaluacion() {
+        System.out.print("\nFiltrar series con cuántas temporadas: ");
+        var totalDeTemporadas = teclado.nextInt();
+        teclado.nextLine(); // Consumir el salto de línea después de leer el número
+        System.out.print("Con evaluación a partir de cuál valor: ");
+        var evaluacion = teclado.nextDouble();
+        teclado.nextLine(); // Consumir el salto de línea después de leer el número
 
+        List<SerieFinal> filtroSeries = repositorio.seriesPorTemporadaYEvaluacion(totalDeTemporadas, evaluacion);
+        System.out.println("***** SERIES FILTRADAS POR TEMPORADA Y EVALUACIÓN *****\n");
+
+        // filtroSeries.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ",
+        // Temporadas: " + s.getTotalDeTemporadas() + ", Evaluación: " +
+        // s.getEvaluacion()));
+        if (filtroSeries.isEmpty()) {
+            System.out.println("\nNo se han encontrado series que tengan episodios en la temporada " + totalDeTemporadas
+                    + " con una evaluación mínima de " + evaluacion + ". Intenta nuevamente con otros criterios.");
+        } else {
+            System.out.println("\nLas series que tienen episodios en la temporada " + totalDeTemporadas
+                    + " con una evaluación mínima de " + evaluacion + " son:\n");
+            filtroSeries.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ", Temporadas: "
+                    + s.getTotalDeTemporadas() + ", Evaluación: " + s.getEvaluacion()));
+        }
+    }
+
+    private void buscarEpisodiosPorTitulo() {
+        System.out.print("\nPor favor, escribe el título del episodio que deseas buscar: ");
+        var tituloEpisodio = teclado.nextLine();
+        List<EpisodioFinal> episodiosEncontrados = repositorio.episodiosPorTitulo(tituloEpisodio);
+
+        // for (SerieFinal serie : seriesFinal) {
+        // List<EpisodioFinal> episodios = serie.getEpisodios();
+        // if (episodios != null) {
+        // episodios.stream()
+        // .filter(e ->
+        // e.getTitulo().toLowerCase().contains(tituloEpisodio.toLowerCase()))
+        // .forEach(episodiosEncontrados::add);
+        // }
+        // }
+
+        if (episodiosEncontrados.isEmpty()) {
+            System.out.println("\nNo se han encontrado episodios con el título '" + tituloEpisodio
+                    + "'. Intenta nuevamente con otro título.");
+        } else {
+            System.out.println("\nLos episodios que coinciden con el título '" + tituloEpisodio + "' son:\n");
+            episodiosEncontrados
+                    .forEach(e -> System.out.printf("Serie: %s, Temporada: %s, Episodio: %s, Evaluación: %s\n",
+                            e.getSerieFinal().getTitulo(), e.getTemporada(), e.getNumeroEpisodio(), e.getEvaluacion()));
+            episodiosEncontrados.forEach(e -> System.out.println("Serie: " + e.getSerieFinal().getTitulo()
+                    + ", Temporada: " + e.getTemporada() + ", Episodio: " + e.getTitulo()));
+        }
+    }
+
+    private void buscarTop5Episodios() {
+        buscarSeriesPorTitulo();
+
+        if (serieBuscada.isPresent()) {
+            SerieFinal serie = serieBuscada.get();
+            List<EpisodioFinal> topEpisodios = repositorio.top5Episodios(serie);
+
+            if (topEpisodios == null || topEpisodios.isEmpty()) {
+                System.out.println("\nNo se han encontrado episodios para la serie '" + serie.getTitulo()
+                        + "'. Asegúrate de haber buscado la serie y obtenido sus episodios previamente.");
+                return;
+            } else {
+                System.out.println(
+                        "\nNo se ha encontrado la serie que has buscado. Por favor, intenta de nuevo con otro título.");
+            }
+
+        }
+    }
 }

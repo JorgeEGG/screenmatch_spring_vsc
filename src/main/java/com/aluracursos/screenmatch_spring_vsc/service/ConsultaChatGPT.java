@@ -4,11 +4,10 @@ import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 
 public class ConsultaChatGPT {
-
     public static String obtenerTraduccion(String texto) {
-        String apiKey = System.getenv("OPENAI_API_KEY");
+        String apiKey = System.getenv("OPENAI_APIKEY");
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("No se encontró la variable de entorno OPENAI_API_KEY");
+            throw new IllegalStateException("No se encontró la variable de entorno OPENAI_APIKEY");
         }
         OpenAiService service = new OpenAiService(apiKey);
 

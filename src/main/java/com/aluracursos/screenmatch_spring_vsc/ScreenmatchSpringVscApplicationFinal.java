@@ -9,18 +9,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ScreenmatchSpringVscApplicationFinal implements CommandLineRunner {
+    
     @Autowired
     private SerieFinalRepository repository;
-
     public static void main(String[] args) {
         SpringApplication.run(ScreenmatchSpringVscApplicationFinal.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
-
         PrincipalFinal principal = new PrincipalFinal(repository);
         principal.muestraElMenu();
-
     }
 }
