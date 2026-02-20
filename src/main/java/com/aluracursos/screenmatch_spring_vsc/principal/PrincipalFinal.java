@@ -282,12 +282,12 @@ public class PrincipalFinal {
     private void buscarSeriesPorTitulo() {
         System.out.print("Por favor, escribe el nombre de la serie que deseas buscar: ");
         var nombreSerie = teclado.nextLine();
-        Optional<SerieFinal> serieBuscada = repositorio.findByTituloContainsIgnoreCase(nombreSerie);
+        serieBuscada = repositorio.findByTituloContainsIgnoreCase(nombreSerie);
 
         if (serieBuscada.isPresent()) {
             System.out.println("\nLa serie que has buscado es: \n\n" + serieBuscada.get());
         } else {
-            System.out.println("\nNo se ha encontrado ninguna serie con el título '" + nombreSerie
+            System.out.println("\nNo se ha encontrado la serie con el título '" + nombreSerie
                     + "'. Por favor, intenta de nuevo con otro título.");
         }
     }
@@ -343,17 +343,17 @@ public class PrincipalFinal {
         teclado.nextLine(); // Consumir el salto de línea después de leer el número
 
         List<SerieFinal> filtroSeries = repositorio.seriesPorTemporadaYEvaluacion(totalDeTemporadas, evaluacion);
-        System.out.println("***** SERIES FILTRADAS POR TEMPORADA Y EVALUACIÓN *****\n");
-
+        
         // filtroSeries.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ",
         // Temporadas: " + s.getTotalDeTemporadas() + ", Evaluación: " +
         // s.getEvaluacion()));
         if (filtroSeries.isEmpty()) {
-            System.out.println("\nNo se han encontrado series que tengan episodios en la temporada " + totalDeTemporadas
-                    + " con una evaluación mínima de " + evaluacion + ". Intenta nuevamente con otros criterios.");
+            System.out.println("\nNo se han encontrado series que tengan " + totalDeTemporadas
+            + " o menos temporadas, con una evaluación mínima de " + evaluacion + ". Intenta nuevamente con otros criterios.");
         } else {
-            System.out.println("\nLas series que tienen episodios en la temporada " + totalDeTemporadas
-                    + " con una evaluación mínima de " + evaluacion + " son:\n");
+            System.out.println("\nLas series que tienen " + totalDeTemporadas
+            + " o menos temporadas, con una evaluación mínima de " + evaluacion + " son:\n");
+            System.out.println("***** SERIES FILTRADAS POR TEMPORADAS Y EVALUACIÓN *****\n");
             filtroSeries.forEach(s -> System.out.println("Serie: " + s.getTitulo() + ", Temporadas: "
                     + s.getTotalDeTemporadas() + ", Evaluación: " + s.getEvaluacion()));
         }
@@ -378,12 +378,13 @@ public class PrincipalFinal {
             System.out.println("\nNo se han encontrado episodios con el título '" + tituloEpisodio
                     + "'. Intenta nuevamente con otro título.");
         } else {
-            System.out.println("\nLos episodios que coinciden con el título '" + tituloEpisodio + "' son:\n");
-            episodiosEncontrados
-                    .forEach(e -> System.out.printf("Serie: %s, Temporada: %s, Episodio: %s, Evaluación: %s\n",
+            System.out.println("\nLos episodios que coinciden con el título '" + tituloEpisodio + "' son:");
+            System.out.println("\n***** EPISODIOS ENCONTRADOS *****\n");
+            episodiosEncontrados.forEach(e -> System.out.printf("Serie: %s, Temporada: %s, Episodio: %s, Evaluación: %s\n",
                             e.getSerieFinal().getTitulo(), e.getTemporada(), e.getNumeroEpisodio(), e.getEvaluacion()));
+            System.out.println();
             episodiosEncontrados.forEach(e -> System.out.println("Serie: " + e.getSerieFinal().getTitulo()
-                    + ", Temporada: " + e.getTemporada() + ", Episodio: " + e.getTitulo()));
+                    + ", Temporada: " + e.getTemporada() + ", Episodio: " + e.getNumeroEpisodio() + " - " + e.getTitulo() + ", Evaluación: " + e.getEvaluacion()));
         }
     }
 
@@ -399,9 +400,14 @@ public class PrincipalFinal {
                         + "'. Asegúrate de haber buscado la serie y obtenido sus episodios previamente.");
                 return;
             } else {
-                System.out.println(
-                        "\nNo se ha encontrado la serie que has buscado. Por favor, intenta de nuevo con otro título.");
+                System.out.println("\nLos 5 mejores episodios de la serie '" + serie.getTitulo() + "' son:\n");
+                topEpisodios.forEach(e -> System.out.printf("%s, Temporada %s, Episodio %s, Título: %s, Evaluación %s\n",
+                                e.getSerieFinal().getTitulo(), e.getTemporada(), e.getNumeroEpisodio(), e.getTitulo(), e.getEvaluacion()));
             }
+            // else {
+            //     System.out.println(
+            //             "\nNo se ha encontrado la serie que has buscado. Por favor, intenta de nuevo con otro título.");
+            // }
 
         }
     }

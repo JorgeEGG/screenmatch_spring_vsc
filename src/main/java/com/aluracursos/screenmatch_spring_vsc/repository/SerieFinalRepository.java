@@ -21,6 +21,6 @@ public interface SerieFinalRepository extends JpaRepository<SerieFinal, Long>{
     @Query("SELECT e FROM SerieFinal s JOIN s.episodios e WHERE e.titulo ILIKE %:tituloEpisodio%")
     List<EpisodioFinal> episodiosPorTitulo(String tituloEpisodio);
     
-    @Query("SELECT e FROM SerieFinal s JOIN s.episodios e WHERE s = :serie ORDER BY e.evaluacion DESC")
+    @Query("SELECT e FROM SerieFinal s JOIN s.episodios e WHERE s = :serie ORDER BY e.evaluacion DESC LIMIT 5")
     List<EpisodioFinal> top5Episodios(SerieFinal serie);
 }
