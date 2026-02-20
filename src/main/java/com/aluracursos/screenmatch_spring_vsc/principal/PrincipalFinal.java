@@ -198,15 +198,16 @@ public class PrincipalFinal {
                                  // ahora, pero ya no se utilizará para obtener los datos de la serie de la que
                                  // se quieren buscar los episodios, sino que se obtendrán directamente de la
                                  // base de datos. Por lo tanto, esta línea de código ya no es necesaria.
-        System.out.print("Por favor, escribe el nombre de la serie de la que deseas buscar los episodios: ");
+        System.out.print("Por favor, escribe el nombre de la serie de la que deseas buscar episodios: ");
         var nombreSerie = teclado.nextLine();
+
         Optional<SerieFinal> serieFinal = seriesFinal.stream()
                 .filter(s -> s.getTitulo().toLowerCase().contains(nombreSerie.toLowerCase()))
                 .findFirst();
 
         if (serieFinal.isPresent()) {
             var serieEncontrada = serieFinal.get();
-            System.out.println("Los episodios de la serie " + serieEncontrada.getTitulo() + " son:\n");
+            System.out.println("\nLos episodios de la serie " + serieEncontrada.getTitulo() + " son:");
 
             // DatosSerieFinal datosSerie = serieFinal.get().getDatosSerieFinal(); De la
             // misma forma que en los episodios, ya no se utilizarán los datos de la serie
@@ -221,6 +222,7 @@ public class PrincipalFinal {
                 var json = consumoAPI.obtenerDatos(
                         URL_BASE + serieEncontrada.getTitulo().replace(" ", "+") + "&Season=" + i + API_KEY);
                 DatosTemporadasFinal datosTemporadasFinal = conversor.obtenerDatos(json, DatosTemporadasFinal.class);
+
                 if (datosTemporadasFinal == null || esTemporadaInvalida(datosTemporadasFinal)) {
                     System.out.println("No se encontraron episodios válidos para la temporada " + i + ".");
                     continue;
@@ -236,7 +238,7 @@ public class PrincipalFinal {
 
             System.out.println();
             // temporadas.forEach(System.out::println);
-            // El siguie
+            // El siguiente código muestra los episodios de cada temporada de la serie, pero también se podría mostrar directamente los episodios obtenidos de la base de datos, sin necesidad de mostrar los datos de las temporadas obtenidos del API. Por lo tanto, este código se puede comentar o eliminar si se decide mostrar directamente los episodios obtenidos de la base de datos.
             temporadas.forEach(t -> {
                 System.out.println(t);
                 System.out.println();
