@@ -23,4 +23,7 @@ public interface SerieFinalRepository extends JpaRepository<SerieFinal, Long>{
     
     @Query("SELECT e FROM SerieFinal s JOIN s.episodios e WHERE s = :serie ORDER BY e.evaluacion DESC LIMIT 5")
     List<EpisodioFinal> top5Episodios(SerieFinal serie);
+
+    @Query("SELECT s FROM SerieFinal s JOIN s.episodios e GROUP BY s ORDER BY MAX(e.fechaDeLanzamiento) DESC LIMIT 5")
+    List<SerieFinal> lanzamientosMasRecientes();
 }
