@@ -1,13 +1,16 @@
 package com.aluracursos.screenmatch_spring_vsc.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 // import org.springframework.web.bind.annotation.GetMapping;
 
+import com.aluracursos.screenmatch_spring_vsc.dto.EpisodioDTO;
 import com.aluracursos.screenmatch_spring_vsc.dto.SerieDTO;
+import com.aluracursos.screenmatch_spring_vsc.model.Categoria;
 import com.aluracursos.screenmatch_spring_vsc.model.SerieFinal;
 import com.aluracursos.screenmatch_spring_vsc.repository.SerieFinalRepository;
 
@@ -64,6 +67,7 @@ public class SerieService {
     public List<SerieDTO> convierteDatos(List<SerieFinal> serie) {
         return serie.stream()
                 .map(s -> new SerieDTO(
+                        s.getId(),
                         s.getTitulo(),
                         s.getTotalDeTemporadas(),
                         s.getEvaluacion(),
@@ -73,5 +77,55 @@ public class SerieService {
                         s.getDuracion(),
                         s.getSinopsis()))
                 .collect(Collectors.toList());
+    }
+
+    public SerieDTO obtenerSeriePorId(Long id) {
+        Optional<SerieFinal> serie = repository.findById(id);
+
+        if (serie.isPresent()) {
+            SerieFinal s = serie.get();
+            return new SerieDTO(
+                    s.getId(),
+                    s.getTitulo(),
+                    s.getTotalDeTemporadas(),
+                    s.getEvaluacion(),
+                    s.getPoster(),
+                    s.getGenero(),
+                    s.getActores(),
+                    s.getDuracion(),
+                    s.getSinopsis());
+        } else {
+            return null; // o lanzar una excepción, dependiendo de cómo quieras manejar el caso de serie no encontrada
+        }
+    }
+
+    public List<EpisodioDTO> obtenerTodasLasTemporadas(Long id) {
+        Optional<SerieFinal> serie = repository.findById(id);
+        
+        if (serie.isPresent()) {
+            SerieFinal s = serie.get();
+            return s.getEpisodios().stream()
+                    .map(e -> new EpisodioDTO(
+                            e.getTemporada(),
+                            e.getTitulo(),
+                            e.getNumeroEpisodio()))
+                    .collect(Collectors.toList());
+        } else {
+            return null; // o lanzar una excepción, dependiendo de cómo quieras manejar el caso de serie no encontrada
+        }
+    }
+
+    public List<EpisodioDTO> obtenerTemporadasPorNumero(Long id, Long numeroTemporada) {
+        return repository.obtenerTemporadasPorNumero(id, numeroTemporada).stream()
+                .map(e -> new EpisodioDTO(
+                        e.getTemporada(),
+                        e.getTitulo(),
+                        e.getNumeroEpisodio()))
+                .collect(Collectors.toList());
+    }
+
+    public List<SerieDTO> obtenerSeriesPorCategoria(String nombreCategoria) {
+        Categoria categoria = Categoria.fromEspanol(nombreCategoria);
+        return convierteDatos(repository.findByGenero(categoria));
     }
 }

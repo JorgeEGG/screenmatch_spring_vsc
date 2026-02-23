@@ -4,6 +4,7 @@ import com.aluracursos.screenmatch_spring_vsc.model.Categoria;
 
 
 public record SerieDTO(
+    Long id,
     String titulo,
     Integer totalDeTemporadas,
     Double evaluacion,
